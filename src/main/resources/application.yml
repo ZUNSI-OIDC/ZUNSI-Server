@@ -1,0 +1,14 @@
+spring:
+  jwt.secret: fn1@!#FDSVC@dsvca2lk12
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/zunsi
+    username: root
+    password: password
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
