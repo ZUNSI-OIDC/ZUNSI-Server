@@ -12,3 +12,7 @@ spring:
     hibernate:
       ddl-auto: update
 
+  mvc:
+    view:
+      prefix: /WEB-INF/
+      suffix: .jsp

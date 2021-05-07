@@ -11,6 +11,7 @@
     <groupId>com.oidc</groupId>
     <artifactId>zunsi</artifactId>
     <version>0.0.1</version>
+    <packaging>war</packaging>
     <name>zunsi</name>
     <description>Demo project for Spring Boot</description>
     <properties>
@@ -75,6 +76,19 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
         </dependency>
     </dependencies>
 

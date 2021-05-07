@@ -36,28 +36,17 @@ public class User extends BaseTime implements UserDetails {
     @Column(nullable = false)
     private String username;
 
-    @Setter
-    @Column(nullable = false)
-    private LocalDate birth;
-
-    @Column(nullable = false)
-    private boolean terms;
-
-    @Setter
-    @Column(nullable = false)
-    private boolean isMajor;
-
     @Column(nullable = false)
     private Role role;
 
     @Setter
     private String email; // 현재 db 스키마에 없음
+
     @Setter
     private String bio;
+
     @Setter
     private String profileImageUrl;
-    @Setter
-    private String bgImageUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

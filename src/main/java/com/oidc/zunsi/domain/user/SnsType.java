@@ -7,9 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SnsType {
 
-    kakao("kakao"),
-    google("google"),
-    facebook("facebook"),
+    naver("naver"),
     apple("apple"),
     test("test");
 
