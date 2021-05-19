@@ -1,5 +1,6 @@
 package com.oidc.zunsi.service;
 
+import com.oidc.zunsi.config.security.JwtTokenProvider;
 import com.oidc.zunsi.domain.user.SnsType;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.user.UserRepository;
@@ -13,8 +14,9 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    private SignService signService;
-    private UserRepository userRepository;
+    private final SignService signService;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public boolean isUserExist(String provider, String accessToken) {
         String snsId = signService.getSnsId(provider, accessToken);
@@ -30,5 +32,16 @@ public class UserService {
 
     public void save(User newUser) {
         userRepository.save(newUser);
+    }
+
+    public User getUserByJwt(String jwt) {
+        String userId = jwtTokenProvider.getUserPk(jwt);
+        return userRepository.findById(Long.valueOf(userId)).orElseThrow(()-> new IllegalArgumentException("User not found"));
+    }
+
+    public User getUserByProviderAndToken(String provider, String accessToken) {
+        String snsId = signService.getSnsId(provider, accessToken);
+        SnsType snsType = SnsType.valueOf(provider);
+        return userRepository.findBySnsIdAndProvider(snsId, snsType).orElseThrow(()-> new IllegalArgumentException("User not found"));
     }
 }

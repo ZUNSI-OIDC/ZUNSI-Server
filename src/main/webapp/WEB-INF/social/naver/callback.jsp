@@ -10,11 +10,11 @@
 </head>
 
 <%
-    String clientId = "6fEYcawWb2dM59fqDlpe";
-    String clientSecret = "1gerFX3Y6P";
+    String clientId = (String) request.getAttribute("clientId");
+    String clientSecret = (String) request.getAttribute("clientSecret");
     String code = request.getParameter("code");
     String state = request.getParameter("state");
-    String redirectURI = URLEncoder.encode("http://localhost:8080/social/login/naver/callback", "UTF-8");
+    String redirectURI = URLEncoder.encode(request.getAttribute("callbackUrl") + "social/login/naver/callback", "UTF-8");
     String apiURL;
     apiURL = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&";
     apiURL += "client_id=" + clientId;

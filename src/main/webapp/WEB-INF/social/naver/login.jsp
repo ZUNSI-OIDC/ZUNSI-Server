@@ -9,8 +9,8 @@
 </head>
 <body>
 <%
-  String clientId="6fEYcawWb2dM59fqDlpe";
-  String redirectURI=URLEncoder.encode("http://localhost:8080/social/login/naver/callback","UTF-8");
+  String clientId= (String) request.getAttribute("clientId");
+  String redirectURI=URLEncoder.encode(request.getAttribute("callbackUrl") + "social/login/naver/callback","UTF-8");
   SecureRandom random=new SecureRandom();
   String state=new BigInteger(130, random).toString();
   String apiURL = "https://nid.naver.com/oauth2.0/authorize?response_type=code";

@@ -13,7 +13,7 @@ public class SignService {
     public String getSnsId(String provider, String accessToken) {
         String snsId;
         if (provider.equals(SnsType.naver.getType())) {
-            snsId = naverService.getId();
+            snsId = naverService.getId(accessToken);
         } else if (provider.equals(SnsType.apple.getType())) {
             throw new IllegalArgumentException("not supported sns");
         }else {

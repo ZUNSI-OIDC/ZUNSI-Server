@@ -11,7 +11,7 @@
     <groupId>com.oidc</groupId>
     <artifactId>zunsi</artifactId>
     <version>0.0.1</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>zunsi</name>
     <description>Demo project for Spring Boot</description>
     <properties>
