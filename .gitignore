@@ -32,5 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
+**/application.yml
+**/application-deploy.yml
+**/application-local.yml
 deploy.sh
 shutdown.sh
