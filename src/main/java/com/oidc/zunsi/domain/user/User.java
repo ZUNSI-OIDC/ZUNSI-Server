@@ -3,6 +3,9 @@ package com.oidc.zunsi.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.oidc.zunsi.domain.common.BaseTime;
+import com.oidc.zunsi.domain.enums.Place;
+import com.oidc.zunsi.domain.enums.SnsType;
+import com.oidc.zunsi.domain.enums.ZunsiType;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -46,6 +51,15 @@ public class User extends BaseTime implements UserDetails {
 
     @Setter
     private String profileImageUrl;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private Place place;
+
+    @Setter
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<ZunsiType> favoriteZunsiType = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

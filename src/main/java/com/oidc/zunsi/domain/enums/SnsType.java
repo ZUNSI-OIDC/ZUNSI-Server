@@ -1,4 +1,4 @@
-package com.oidc.zunsi.domain.user;
+package com.oidc.zunsi.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -3,7 +3,6 @@ package com.oidc.zunsi.controller.v1;
 import com.oidc.zunsi.config.security.JwtTokenProvider;
 import com.oidc.zunsi.domain.response.SingleResult;
 import com.oidc.zunsi.domain.social.naver.NaverProfile;
-import com.oidc.zunsi.domain.user.SnsType;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.dto.auth.SigninReqDto;
 import com.oidc.zunsi.dto.auth.SignupReqDto;
@@ -47,7 +46,6 @@ public class SignController {
             @ApiParam(value = "json") @RequestBody SigninReqDto signinReqDto
     ) {
         User user = userService.getUserByProviderAndToken(signinReqDto.getProvider(), signinReqDto.getAccessToken());
-        // userService.registerAccessToken(user, fcmMessageService.getAccessToken());
         String jwt = jwtTokenProvider.createToken(String.valueOf(user.getId()), user.getRole());
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(jwt));
     }
@@ -57,26 +55,10 @@ public class SignController {
     public ResponseEntity<SingleResult<String>> signupProvider(
             @ApiParam(value = "json") @RequestBody SignupReqDto signupReqDto
     ) {
-        String provider = signupReqDto.getProvider();
-        String accessToken = signupReqDto.getAccessToken();
-        String name = signupReqDto.getName();
-        SnsType snsType = SnsType.valueOf(provider);
-        // TODO: SNS ID 를 각 프로필에서 가져오도록 로직 변경
-        String snsId = signService.getSnsId(provider, accessToken);
-
-        if (userService.isUserExist(provider, accessToken)) throw new IllegalArgumentException("already registered");
-        if (!userService.validateUsername(name)) throw new IllegalArgumentException("illegal name");
-
-        User newUser = User.builder()
-                .snsId(snsId)
-                .provider(snsType)
-                .username(name)
-                .role(User.Role.USER)
-                .build();
+        log.info(signupReqDto.toString());
+        User newUser = signService.getUserFromDto(signupReqDto);
         userService.save(newUser);
-
         String jwt = jwtTokenProvider.createToken(String.valueOf(newUser.getId()), newUser.getRole());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(jwt));
     }
 }
