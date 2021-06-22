@@ -31,7 +31,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션을 생성하지 않음
                 .and()
                 .authorizeRequests()
-                .antMatchers("/v1/auth/**", "/social/**").permitAll()
+                .antMatchers(
+                        "/v1/auth/**",
+                        "/social/**",
+                        "/v1/common/**",
+                        "/v1/zunsi/**",
+                        "/v1/search/**",
+                        "/v1/review/**"
+                )
+                .permitAll()
                 .antMatchers(HttpMethod.GET, "/exception/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/user/").hasRole("ADMIN")
                 .anyRequest().hasRole("USER")
