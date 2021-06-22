@@ -6,6 +6,7 @@ import com.oidc.zunsi.domain.common.BaseTime;
 import com.oidc.zunsi.domain.enums.Place;
 import com.oidc.zunsi.domain.enums.SnsType;
 import com.oidc.zunsi.domain.enums.ZunsiType;
+import com.oidc.zunsi.domain.zzim.Zzim;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,6 +41,9 @@ public class User extends BaseTime implements UserDetails {
     @Column(nullable = false)
     private String username;
 
+    @Setter
+    private String nickname;
+
     @Column(nullable = false)
     private Role role;
 
@@ -57,9 +61,15 @@ public class User extends BaseTime implements UserDetails {
     private Place place;
 
     @Setter
+    private Boolean notification;
+
+    @Setter
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private Set<ZunsiType> favoriteZunsiType = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<Zzim> zzims = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
