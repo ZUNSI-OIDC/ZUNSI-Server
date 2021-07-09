@@ -1,7 +1,7 @@
 package com.oidc.zunsi.controller.v1;
 
 import com.oidc.zunsi.domain.response.SingleResult;
-import com.oidc.zunsi.dto.map.MapResDto;
+import com.oidc.zunsi.dto.map.CoordinateResDto;
 import com.oidc.zunsi.service.ResponseService;
 import com.oidc.zunsi.service.naver.MapService;
 import io.swagger.annotations.Api;
@@ -26,10 +26,10 @@ public class MapController {
 
     @ApiOperation(value = "주소로 좌표 얻기")
     @GetMapping("/coordinate/{address}")
-    public ResponseEntity<SingleResult<MapResDto>> getCoordinate(
+    public ResponseEntity<SingleResult<CoordinateResDto>> getCoordinate(
             @PathVariable String address
             ) {
-        MapResDto resDto = mapService.getCoordinate(address);
+        CoordinateResDto resDto = mapService.getCoordinate(address);
         log.info(resDto.toString());
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(resDto));
     }
