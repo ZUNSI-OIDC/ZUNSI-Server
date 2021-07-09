@@ -37,7 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v1/common/**",
                         "/v1/zunsi/**",
                         "/v1/search/**",
-                        "/v1/review/**"
+                        "/v1/review/**",
+                        "/v1/map/**"
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/exception/**").permitAll()
