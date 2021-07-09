@@ -2,8 +2,10 @@ package com.oidc.zunsi.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public enum Place {
     Seoul("서울"),

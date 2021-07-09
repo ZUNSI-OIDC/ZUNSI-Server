@@ -33,7 +33,7 @@ public class CommonController {
         List<HashMap<String, String>> zunsiTypeList = new ArrayList<>();
         for (ZunsiType zunsi : zunsiTypes) {
             HashMap<String, String> zunsiMap = new HashMap<>();
-            zunsiMap.put("id", zunsi.toString());
+            zunsiMap.put("id", zunsi.name());
             zunsiMap.put("valueKr", zunsi.getKo());
             zunsiTypeList.add(zunsiMap);
         }
@@ -47,7 +47,7 @@ public class CommonController {
         List<HashMap<String, String>> placeMapList = new ArrayList<>();
         for (Place place : places) {
             HashMap<String, String> placeMap = new HashMap<>();
-            placeMap.put("id", place.toString());
+            placeMap.put("id", place.name());
             placeMap.put("valueKr", place.getKo());
             placeMapList.add(placeMap);
         }
