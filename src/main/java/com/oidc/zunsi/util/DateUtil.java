@@ -43,7 +43,7 @@ public class DateUtil {
 
     public static LocalDateTime getEndDate(int year, int month) {
         Calendar cal = Calendar.getInstance();
-        cal.set(year, month, 1);
+        cal.set(year, month - 1, 1);
         int lastDate = cal.getActualMaximum(Calendar.DATE);
         return LocalDateTime.of(LocalDate.of(year, month, lastDate), LocalTime.of(23, 59, 59));
     }
