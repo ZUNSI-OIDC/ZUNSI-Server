@@ -12,14 +12,16 @@ public class DateUtil {
     }
 
     public static LocalDateTime getLastMonthFirstDate() {
-        int y = LocalDate.now().getYear();
-        int m = LocalDate.now().getMonthValue() - 1;
+        int cur_m = LocalDate.now().getMonthValue();
+        int m = cur_m == 1 ? 12 : cur_m - 1;
+        int y = m == 12 ? LocalDate.now().getYear() - 1 : LocalDate.now().getYear();
         return getStartDate(y, m);
     }
 
     public static LocalDateTime getLastMonthLastDate() {
-        int y = LocalDate.now().getYear();
-        int m = LocalDate.now().getMonthValue() - 1;
+        int cur_m = LocalDate.now().getMonthValue();
+        int m = cur_m == 1 ? 12 : cur_m - 1;
+        int y = m == 12 ? LocalDate.now().getYear() - 1 : LocalDate.now().getYear();
         return getEndDate(y, m);
     }
 
@@ -41,6 +43,7 @@ public class DateUtil {
 
     public static LocalDateTime getEndDate(int year, int month) {
         Calendar cal = Calendar.getInstance();
+        cal.set(year, month, 1);
         int lastDate = cal.getActualMaximum(Calendar.DATE);
         return LocalDateTime.of(LocalDate.of(year, month, lastDate), LocalTime.of(23, 59, 59));
     }
