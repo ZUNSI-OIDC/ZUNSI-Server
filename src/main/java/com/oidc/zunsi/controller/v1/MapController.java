@@ -28,7 +28,7 @@ public class MapController {
     @GetMapping("/coordinate/{address}")
     public ResponseEntity<SingleResult<CoordinateResDto>> getCoordinate(
             @PathVariable String address
-            ) {
+    ) {
         CoordinateResDto resDto = mapService.getCoordinate(address);
         log.info(resDto.toString());
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(resDto));
