@@ -1,5 +1,6 @@
 package com.oidc.zunsi.controller.v1;
 
+import com.oidc.zunsi.domain.response.PageResult;
 import com.oidc.zunsi.domain.response.SingleResult;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.zunsi.Zunsi;
@@ -11,6 +12,7 @@ import com.oidc.zunsi.service.ZunsiService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.geo.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,8 +69,8 @@ public class ZunsiController {
                 .artist(artist)
                 .startDate(Instant.ofEpochMilli(startDate).atZone(ZoneId.of("Asia/Seoul")).toLocalDate())
                 .endDate(Instant.ofEpochMilli(endDate).atZone(ZoneId.of("Asia/Seoul")).toLocalDate())
-                .startTime(LocalTime.of(startTime/100, startTime%100))
-                .endTime(LocalTime.of(endTime/100, endTime%100))
+                .startTime(LocalTime.of(startTime / 100, startTime % 100))
+                .endTime(LocalTime.of(endTime / 100, endTime % 100))
                 .address(address)
                 .placeName(placeName)
                 .webUrl(webUrl)
@@ -90,6 +92,7 @@ public class ZunsiController {
     ) {
         Zunsi zunsi = zunsiService.getZunsiById(zunsiId);
         ZunsiResDto resDto = zunsiService.getZunsiResDto(zunsi);
+        log.info("get zunsi: {}", zunsiId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(resDto));
     }
 
@@ -97,13 +100,20 @@ public class ZunsiController {
     // 사용자 (거주 지역, 선호 전시회 종류)
     // 찜한 전시회 종류, 리뷰 쓴 전시회 종류, 현재 날짜
     @ApiOperation(value = "전시 추천")
-    @PostMapping(value = "/recommend/{page}")
-    public ResponseEntity<SingleResult<String>> getRecommendedZunsi(
-            @ApiParam(value = "page") @PathVariable Long page
+    @PostMapping(value = "/list")
+    public ResponseEntity<PageResult<ZunsiResDto>> getZunsiList(
+            @RequestHeader(name = "Authorization", required = false) String jwt,
+            @ApiParam(value = "filter") @RequestParam String filter,
+            @ApiParam(value = "limit") @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "0") Integer page,
+            @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "37.574") Double latitude,
+            @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "126.976") Double longitude
     ) {
-//        Zunsi zunsi = zunsiService.getZunsiById(zunsiId);
-//        ZunsiResDto resDto = zunsiService.getZunsiResDto(zunsi);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult("^^"));
+        User user = userService.getUserByJwt(jwt);
+        List<ZunsiResDto> zunsiResDtoList = zunsiService.getZunsiList(user, filter, limit, page, new Point(latitude, longitude));
+        log.info("filter: {}\tlimit: {}\tpage: {}", filter, limit, page);
+        log.info("latitude:{} \tlongitude: {}", latitude, longitude);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getPageListResult(zunsiResDtoList, false));
     }
 
     // 전시 리스트 가져오기 인기순

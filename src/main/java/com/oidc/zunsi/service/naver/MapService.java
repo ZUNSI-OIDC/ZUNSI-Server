@@ -3,10 +3,12 @@ package com.oidc.zunsi.service.naver;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.oidc.zunsi.dto.map.CoordinateResDto;
 import com.oidc.zunsi.dto.map.MapResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Point;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +28,7 @@ public class MapService {
 
     private final RestTemplate restTemplate;
 
-    public MapResDto getCoordinate(String address) {
+    public CoordinateResDto getCoordinate(String address) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -49,16 +51,22 @@ public class MapService {
             throw new IllegalArgumentException("주소에 해당하는 좌표를 찾지 못했습니다.");
         }
 
-        return MapResDto.builder()
-                .status(jsonObject.get("status").toString().replaceAll("\"", ""))
-                .address(MapResDto.Address.builder()
-                        .roadAddress(addressData.get("roadAddress").toString().replaceAll("\"", ""))
-                        .jibunAddress(addressData.get("jibunAddress").toString().replaceAll("\"", ""))
-                        .englishAddress(addressData.get("englishAddress").toString().replaceAll("\"", ""))
-                        .x(addressData.get("x").toString().replaceAll("\"", ""))
-                        .y(addressData.get("y").toString().replaceAll("\"", ""))
-                        .build())
-                .errorMessage(jsonObject.get("errorMessage").toString().replaceAll("\"", ""))
+//        MapResDto.builder()
+//                .status(jsonObject.get("status").toString().replaceAll("\"", ""))
+//                .address(MapResDto.Address.builder()
+//                        .roadAddress(addressData.get("roadAddress").toString().replaceAll("\"", ""))
+//                        .jibunAddress(addressData.get("jibunAddress").toString().replaceAll("\"", ""))
+//                        .englishAddress(addressData.get("englishAddress").toString().replaceAll("\"", ""))
+//                        .x(addressData.get("x").toString().replaceAll("\"", ""))
+//                        .y(addressData.get("y").toString().replaceAll("\"", ""))
+//                        .build())
+//                .errorMessage(jsonObject.get("errorMessage").toString().replaceAll("\"", ""))
+//                .build();
+        return CoordinateResDto.builder()
+                .address(addressData.get("roadAddress").toString().replaceAll("\"", ""))
+                .point(new Point(
+                        Double.parseDouble(addressData.get("x").toString().replaceAll("\"", "")),
+                        Double.parseDouble(addressData.get("y").toString().replaceAll("\"", ""))))
                 .build();
     }
 }
