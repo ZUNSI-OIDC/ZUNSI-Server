@@ -3,6 +3,7 @@ package com.oidc.zunsi.service;
 
 import com.oidc.zunsi.domain.response.CommonResult;
 import com.oidc.zunsi.domain.response.ListResult;
+import com.oidc.zunsi.domain.response.PageResult;
 import com.oidc.zunsi.domain.response.SingleResult;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,5 +53,14 @@ public class ResponseService {
     private void setSuccessResult(CommonResult result) {
         result.setSuccess(true);
         result.setMsg(CommonResponse.SUCCESS.getMsg());
+    }
+
+    public <T> PageResult<T> getPageListResult(List<T> list, boolean hasNext) {
+        PageResult<T> result = new PageResult();
+        result.setData(list);
+        setSuccessResult(result);
+        result.setHasNext(hasNext);
+
+        return result;
     }
 }
