@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @Api(tags = {"Sign"})
 @RequiredArgsConstructor
@@ -40,6 +42,26 @@ public class SignController {
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(naverService.getProfile(accessToken)));
     }
 
+    @ApiOperation(value = "유저 삭제 (네이버 OAuth 토큰)")
+    @DeleteMapping("/sns/{token}")
+    public ResponseEntity<SingleResult<String>> deleteUserBySnsToken(
+            @PathVariable String token
+    ) {
+        User user = userService.getUserByProviderAndToken("naver", token);
+        userService.deleteUser(user);
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult("removed"));
+    }
+
+    @ApiOperation(value = "유저 삭제")
+    @DeleteMapping("/jwt/{jwt}")
+    public ResponseEntity<SingleResult<String>> deleteUser(
+            @PathVariable String jwt
+    ) {
+
+        userService.deleteUser(userService.getUserByJwt(jwt));
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult("removed"));
+    }
+
     @ApiOperation(value = "소셜 로그인")
     @PostMapping(value = "/signin")
     public ResponseEntity<SingleResult<String>> signinByProvider(
@@ -53,11 +75,11 @@ public class SignController {
     @ApiOperation(value = "소셜 계정 가입", notes = "성공시 jwt 토큰을 반환합니다")
     @PostMapping(value = "/signup")
     public ResponseEntity<SingleResult<String>> signupProvider(
-            @ApiParam(value = "json") @RequestBody SignupReqDto signupReqDto
-    ) {
-        log.info(signupReqDto.toString());
-        User newUser = signService.getUserFromDto(signupReqDto);
-        userService.save(newUser);
+            @RequestBody SignupReqDto dto
+    ) throws IOException {
+        log.info(dto.toString());
+        User newUser = signService.getUserFromDto(dto);
+        userService.save(newUser, null);
         String jwt = jwtTokenProvider.createToken(String.valueOf(newUser.getId()), newUser.getRole());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(jwt));
     }
