@@ -5,6 +5,7 @@ import com.oidc.zunsi.domain.response.SingleResult;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
+import com.oidc.zunsi.dto.zunsi.ZunsiListRowDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiResDto;
 import com.oidc.zunsi.service.ResponseService;
@@ -99,7 +100,7 @@ public class ZunsiController {
 
     @ApiOperation(value = "전시 리스트 조회")
     @PostMapping(value = "/list")
-    public ResponseEntity<PageResult<ZunsiResDto>> getZunsiList(
+    public ResponseEntity<PageResult<ZunsiListRowDto>> getZunsiList(
             @RequestHeader(name = "Authorization", required = false) String jwt,
             @ApiParam(value = "filter") @RequestParam(defaultValue = "popular") String filter,
             @ApiParam(value = "limit") @RequestParam(required = false, defaultValue = "10") Integer limit,
