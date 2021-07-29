@@ -26,18 +26,20 @@ public class SignService {
         String accessToken = dto.getAccessToken();
         String name = dto.getName();
         SnsType provider = SnsType.valueOf(dto.getProvider());
-        String place = dto.getPlace();
-        Place placeType;
+        List<String> placeList = dto.getPlaceList();
         List<String> zunsiList = dto.getFavoriteZunsiList();
         Set<ZunsiType> zunsiTypeList = new HashSet<>();
+        Set<Place> placeTypeList = new HashSet<>();
 
         if (userService.isUserExist(provider, accessToken)) throw new IllegalArgumentException("user already exist");
-        if (!userService.validateUsername(name)) throw new IllegalArgumentException("illegal username");
+//        if (!userService.validateUsername(name)) throw new IllegalArgumentException("illegal username");
 
-        try {
-            placeType = Place.valueOf(place);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("illegal place value");
+        if(placeList != null) {
+            try {
+                for (String p : placeList) placeTypeList.add(Place.valueOf(p));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("illegal placeList value");
+            }
         }
 
         if (zunsiList != null) {
@@ -50,8 +52,9 @@ public class SignService {
 
         return User.builder()
                 .username(name)
+                .nickname(name)
                 .snsId(socialServiceFactory.getService(provider).getSnsId(accessToken))
-                .place(placeType)
+                .place(placeTypeList)
                 .favoriteZunsiType(zunsiTypeList)
                 .provider(provider)
                 .profileImageUrl(null)
