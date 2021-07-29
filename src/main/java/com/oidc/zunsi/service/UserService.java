@@ -4,7 +4,6 @@ import com.oidc.zunsi.config.security.JwtTokenProvider;
 import com.oidc.zunsi.domain.enums.Place;
 import com.oidc.zunsi.domain.enums.SnsType;
 import com.oidc.zunsi.domain.enums.ZunsiType;
-import com.oidc.zunsi.domain.review.Review;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.user.UserRepository;
 import com.oidc.zunsi.domain.zzim.Zzim;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -134,21 +132,6 @@ public class UserService {
                     .build());
         }
         return zzimResDtoList;
-    }
-
-    public List<ReviewResDto> getReviewList(User user) {
-        List<ReviewResDto> reviewResDtoList = new ArrayList<>();
-        List<Review> reviewList = reviewService.getReviewByUser(user);
-        for (Review review : reviewList) {
-            reviewResDtoList.add(ReviewResDto.builder()
-                    .reviewId(review.getId())
-                    .title(review.getZunsi().getTitle())
-                    .content(review.getContent())
-                    .posterImageUrl(review.getZunsi().getPosterImageUrl())
-                    .visitedDate(review.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli())
-                    .build());
-        }
-        return reviewResDtoList;
     }
 
     public void changeNotificationOption(User user, Boolean isEnabled) {

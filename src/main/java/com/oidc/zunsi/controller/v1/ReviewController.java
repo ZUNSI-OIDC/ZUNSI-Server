@@ -2,8 +2,9 @@ package com.oidc.zunsi.controller.v1;
 
 import com.oidc.zunsi.domain.response.SingleResult;
 import com.oidc.zunsi.domain.user.User;
-import com.oidc.zunsi.dto.user.ReviewResDto;
+import com.oidc.zunsi.dto.review.ReviewListRowDto;
 import com.oidc.zunsi.service.ResponseService;
+import com.oidc.zunsi.service.ReviewService;
 import com.oidc.zunsi.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Api(tags = {"Review"})
@@ -28,6 +30,7 @@ import java.util.List;
 public class ReviewController {
 
     private final UserService userService;
+    private final ReviewService reviewService;
     private final ResponseService responseService;
 
     // review create
@@ -42,10 +45,12 @@ public class ReviewController {
     })
     @ApiOperation(value = "내 리뷰 리스트")
     @GetMapping("/me")
-    public ResponseEntity<SingleResult<List<ReviewResDto>>> getReviewList(@RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<SingleResult<List<ReviewListRowDto>>> getReviewList(@RequestHeader("Authorization") String jwt) {
         User user = userService.getUserByJwt(jwt);
         if(user == null) throw new IllegalArgumentException("user not exist");
-        List<ReviewResDto> dto = userService.getReviewList(user);
+        List<ReviewListRowDto> dto = reviewService.getReviewByUser(user).stream()
+                .map(reviewService::getListRowDto)
+                .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(dto));
     }
 
