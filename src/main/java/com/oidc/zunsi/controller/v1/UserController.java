@@ -117,18 +117,6 @@ public class UserController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
     })
-
-    @ApiOperation(value = "내 리뷰 리스트")
-    @GetMapping("/me/reviews")
-    public ResponseEntity<SingleResult<List<ReviewResDto>>> getReviewList(@RequestHeader("Authorization") String jwt) {
-        User user = userService.getUserByJwt(jwt);
-        List<ReviewResDto> dto = userService.getReviewList(user);
-        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(dto));
-    }
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
-    })
     @ApiOperation(value = "알림 설정")
     @PostMapping("/me/notification")
     public ResponseEntity<SingleResult<NotificationResDto>> changeNotificationSetting(
