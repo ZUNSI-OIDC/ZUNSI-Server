@@ -39,6 +39,7 @@ public class ReviewService {
                 .id(review.getId())
                 .username(review.getUser().getUsername())
                 .content(review.getContent())
+                .posterImgUrl(review.getZunsi().getPosterImageUrl())
                 .thumbnailUrl(new ArrayList<>(review.getReviewDetailImageUrls()).get(0))
                 .visitDate(LocalDate.from(review.getCreatedAt()))
                 .build();
