@@ -36,6 +36,7 @@ public class Zunsi extends BaseTime {
     private LocalDate endDate;
     private LocalTime startTime;
     private LocalTime endTime;
+    private String place;
     private String placeName;
     private String address;
     private Double longitude;

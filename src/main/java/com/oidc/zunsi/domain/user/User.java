@@ -6,8 +6,11 @@ import com.oidc.zunsi.domain.common.BaseTime;
 import com.oidc.zunsi.domain.enums.Place;
 import com.oidc.zunsi.domain.enums.SnsType;
 import com.oidc.zunsi.domain.enums.ZunsiType;
+import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.domain.zzim.Zzim;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,8 +60,9 @@ public class User extends BaseTime implements UserDetails {
     private String profileImageUrl;
 
     @Setter
-    @Enumerated(EnumType.STRING)
-    private Place place;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<Place> place = new HashSet<>();
 
     @Setter
     private Boolean notification;
@@ -69,7 +73,12 @@ public class User extends BaseTime implements UserDetails {
     private Set<ZunsiType> favoriteZunsiType = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Zzim> zzims = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Zunsi> zunsi = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
