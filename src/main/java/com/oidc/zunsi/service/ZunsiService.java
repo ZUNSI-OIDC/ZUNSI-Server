@@ -40,6 +40,7 @@ public class ZunsiService {
     private final NaverObjectStorageService naverObjectStorageService;
     private final HashtagService hashtagService;
     private final MapService mapService;
+    private final ReviewService reviewService;
 
     public boolean checkType(String t) {
         for (ZunsiType zt : ZunsiType.values())
@@ -152,6 +153,10 @@ public class ZunsiService {
                 .hashtags(hashtags)
                 .likeNum(zzimService.getZzimCountByZunsi(zunsi))
                 .isZzimed(user != null ? zzimService.isZzimed(user, zunsi) : false)
+                .reviews(reviewService.getReviewByZunsi(zunsi).stream()
+                        .map(reviewService::getListRowDto)
+                        .limit(3)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
