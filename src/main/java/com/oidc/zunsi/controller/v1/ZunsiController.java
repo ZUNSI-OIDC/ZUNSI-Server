@@ -97,27 +97,20 @@ public class ZunsiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(resDto));
     }
 
-    // 전시회 추천
-    // 사용자 (거주 지역, 선호 전시회 종류)
-    // 찜한 전시회 종류, 리뷰 쓴 전시회 종류, 현재 날짜
-    @ApiOperation(value = "전시 추천")
+    @ApiOperation(value = "전시 리스트 조회")
     @PostMapping(value = "/list")
     public ResponseEntity<PageResult<ZunsiResDto>> getZunsiList(
             @RequestHeader(name = "Authorization", required = false) String jwt,
-            @ApiParam(value = "filter") @RequestParam String filter,
+            @ApiParam(value = "filter") @RequestParam(defaultValue = "popular") String filter,
             @ApiParam(value = "limit") @RequestParam(required = false, defaultValue = "10") Integer limit,
             @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "0") Integer page,
-            @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "37.574") Double latitude,
-            @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "126.976") Double longitude
+            @ApiParam(value = "user latitude") @RequestParam(required = false, defaultValue = "37.574") Double latitude,
+            @ApiParam(value = "user longitude") @RequestParam(required = false, defaultValue = "126.976") Double longitude
     ) {
         User user = userService.getUserByJwt(jwt);
         ZunsiPageDto dto = zunsiService.getZunsiList(user, filter, limit, page, new Point(latitude, longitude));
         log.info("filter: {}\tlimit: {}\tpage: {}", filter, limit, page);
         log.info("latitude:{} \tlongitude: {}", latitude, longitude);
-        return ResponseEntity.status(HttpStatus.OK).body(responseService.getPageListResult(dto.getZunsiResDtoList(), dto.getHasNext()));
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getPageListResult(dto.getZunsiListDto(), dto.getHasNext()));
     }
-
-    // 전시 리스트 가져오기 인기순
-
-    // 전시 리스트 가져오기 거리순
 }

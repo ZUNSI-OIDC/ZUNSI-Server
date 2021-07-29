@@ -12,7 +12,7 @@ public interface ZunsiRepository extends JpaRepository<Zunsi, Long> {
     Optional<Page<Zunsi>> findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(Double latBottom, Double latTop, Double longBottom, Double longTop, Pageable pageRequest);
 
     // 관심 전시, 지역 순
-    Optional<List<Zunsi>> findAllByPlaceOrderByEndDateDesc(List<String> placeList);
+    Optional<List<Zunsi>> findAllByPlaceOrderByEndDateDesc(String[] placeList);
 
     // 인기순
     Optional<Page<Zunsi>> findAllByOrderByZzimCountDescEndDateDesc(Pageable pageRequest);

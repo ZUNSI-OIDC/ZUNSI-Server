@@ -16,6 +16,12 @@ import java.util.Optional;
 public class ZzimService {
     private final ZzimRepository zzimRepository;
 
+    public Boolean isZzimed(User user, Zunsi zunsi) {
+        List<Zzim> zzims = zzimRepository.findAllByUserAndZunsi(user, zunsi).orElse(null);
+        if(zzims == null) return false;
+        return zzims.size() > 0;
+    }
+
     public Long getZzimCountByZunsi(Zunsi zunsi){
         Optional<List<Zzim>> zzims = zzimRepository.findAllByZunsi(zunsi);
         if(zzims.isEmpty())

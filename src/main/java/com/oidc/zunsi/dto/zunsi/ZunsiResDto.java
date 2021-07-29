@@ -1,6 +1,7 @@
 package com.oidc.zunsi.dto.zunsi;
 
 import com.oidc.zunsi.domain.enums.ZunsiType;
+import com.oidc.zunsi.dto.review.ReviewListRowDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -35,4 +36,6 @@ public class ZunsiResDto {
     private Set<ZunsiType> zunsiTypes;
     private List<String> hashtags;
     private Long likeNum;
+    private Boolean isZzimed;
+    private List<ReviewListRowDto> reviews;
 }

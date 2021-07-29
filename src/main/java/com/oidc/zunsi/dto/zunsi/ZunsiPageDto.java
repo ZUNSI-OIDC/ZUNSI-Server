@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 @ToString
 public class ZunsiPageDto {
-    private List<ZunsiResDto> zunsiResDtoList;
+    private List<ZunsiListRowDto> zunsiListDto;
     private Boolean hasNext;
 }

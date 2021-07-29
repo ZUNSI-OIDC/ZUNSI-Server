@@ -10,6 +10,7 @@ import com.oidc.zunsi.domain.zzim.Zzim;
 import com.oidc.zunsi.dto.map.CoordinateResDto;
 import com.oidc.zunsi.dto.map.RectBoxDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
+import com.oidc.zunsi.dto.zunsi.ZunsiListRowDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiResDto;
 import com.oidc.zunsi.service.naver.MapService;
@@ -104,7 +105,22 @@ public class ZunsiService {
         return zunsi.get();
     }
 
+    public ZunsiListRowDto getZunsiListRowDto(User user, Zunsi zunsi) {
+        return ZunsiListRowDto.builder()
+                .thumbnailUrl(zunsi.getPosterImageUrl())
+                .title(zunsi.getTitle())
+                .placeName(zunsi.getPlaceName())
+                .startDate(zunsi.getStartDate())
+                .endDate(zunsi.getEndDate())
+                .isZzimed(user != null ? zzimService.isZzimed(user, zunsi) : false)
+                .build();
+    }
+
     public ZunsiResDto getZunsiResDto(Zunsi zunsi) {
+        return getZunsiResDto(null, zunsi);
+    }
+
+    public ZunsiResDto getZunsiResDto(User user, Zunsi zunsi) {
         User author = zunsi.getUser();
 
         List<String> hashtags = new ArrayList<>();
@@ -135,21 +151,22 @@ public class ZunsiService {
                 .zunsiTypes(zunsi.getZunsiTypes())
                 .hashtags(hashtags)
                 .likeNum(zzimService.getZzimCountByZunsi(zunsi))
+                .isZzimed(user != null ? zzimService.isZzimed(user, zunsi) : false)
                 .build();
     }
 
     public ZunsiPageDto getZunsiList(User user, String filter, Integer limit, Integer page, Point point) {
         PageRequest pageRequest = PageRequest.of(page, limit);
-        List<ZunsiResDto> res = null;
+        List<ZunsiListRowDto> res = null;
         Page<Zunsi> pageZunsi = null;
         switch (filter) {
             case "zzim":
                 res = zzimService.getZzimList(user)
                         .stream().map(Zzim::getZunsi).collect(Collectors.toList())
-                        .stream().map(this::getZunsiResDto).collect(Collectors.toList());
+                        .stream().map(x -> getZunsiListRowDto(user, x)).collect(Collectors.toList());
                 break;
             case "recommend":
-                List<String> placeList = user.getPlace().stream().map(Place::getKey).collect(Collectors.toList());
+                String[] placeList = user.getPlace().stream().map(Place::getKey).collect(Collectors.toList()).toArray(String[]::new);
                 List<Zunsi> zunsiList = zunsiRepository.findAllByPlaceOrderByEndDateDesc(placeList).orElse(null);
                 if (zunsiList == null) break;
                 zunsiList = zunsiList.stream()
@@ -177,10 +194,10 @@ public class ZunsiService {
                 break;
         }
         if (pageZunsi != null)
-            res = pageZunsi.getContent().stream().map(this::getZunsiResDto).collect(Collectors.toList());
+            res = pageZunsi.getContent().stream().map(x -> getZunsiListRowDto(user, x)).collect(Collectors.toList());
 
         return ZunsiPageDto.builder()
-                .zunsiResDtoList(res != null ? res : Collections.emptyList())
+                .zunsiListDto(res != null ? res : Collections.emptyList())
                 .hasNext(pageZunsi != null && pageZunsi.hasNext())
                 .build();
     }
