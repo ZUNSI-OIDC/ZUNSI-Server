@@ -13,8 +13,10 @@ import com.oidc.zunsi.service.naver.NaverObjectStorageService;
 import com.oidc.zunsi.service.social.SocialServiceFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -57,8 +59,10 @@ public class UserService {
         return socialServiceFactory.getService(provider).getSnsId(accessToken);
     }
 
-    public void save(User newUser) {
-        userRepository.save(newUser);
+    @Transactional
+    public void save(User newUser, MultipartFile profileImage) throws IOException {
+        User user = userRepository.save(newUser);
+        if(profileImage != null) updateProfileImage(user, profileImage);
     }
 
     public User getUserByJwt(String jwt) {
@@ -90,7 +94,11 @@ public class UserService {
                 .build();
     }
 
-    public void updateUser(User user, ProfileReqDto dto) {
+    public void updateUser(User user, ProfileReqDto dto) throws IOException {
+        Set<Place> placeTypeSet = new HashSet<>();
+        for (String p : dto.getPlace()) {
+            placeTypeSet.add(Place.valueOf(p));
+        }
         Set<ZunsiType> zunsiTypeSet = new HashSet<>();
         for (String zunsiType : dto.getFavoriteZunsiList()) {
             zunsiTypeSet.add(ZunsiType.valueOf(zunsiType));
@@ -100,13 +108,13 @@ public class UserService {
         user.setProfileImageUrl(imageUrl);
         user.setUsername(dto.getUsername());
         user.setNickname(dto.getNickname());
-        user.setPlace(Place.valueOf(dto.getPlace()));
+        user.setPlace(placeTypeSet);
         user.setFavoriteZunsiType(zunsiTypeSet);
 
         userRepository.save(user);
     }
 
-    public void updateProfileImage(User user, MultipartFile profileImage) {
+    public void updateProfileImage(User user, MultipartFile profileImage) throws IOException {
         String imageUrl = naverObjectStorageService.uploadProfileImage(user, profileImage);
         user.setProfileImageUrl(imageUrl);
         userRepository.save(user);
@@ -146,5 +154,9 @@ public class UserService {
     public void changeNotificationOption(User user, Boolean isEnabled) {
         user.setNotification(isEnabled);
         userRepository.save(user);
+    }
+
+    public void deleteUser(User user) {
+        userRepository.delete(user);
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -50,13 +51,16 @@ public class UserController {
             @RequestHeader("Authorization") String jwt,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String nickname,
-            @RequestParam(required = false) String place,
+            @RequestParam(required = false) List<String> placeList,
             @RequestParam(required = false) List<String> favoriteZunsiList,
             @RequestParam(required = false) MultipartFile profileImage
-    ) {
+    ) throws IOException {
         User user = userService.getUserByJwt(jwt);
 
-        if (!EnumChecker.checkValidPlace(place)) throw new IllegalArgumentException("invalid place");
+        for (String place : placeList) {
+            if (!EnumChecker.checkValidPlace(place))
+                throw new IllegalArgumentException("invalid place");
+        }
         for (String zunsi : favoriteZunsiList) {
             if (!EnumChecker.checkValidZunsiType(zunsi))
                 throw new IllegalArgumentException("invalid zunsi type");
@@ -64,7 +68,7 @@ public class UserController {
         ProfileReqDto dto = ProfileReqDto.builder()
                 .username(username != null ? username : user.getUsername())
                 .nickname(nickname != null ? nickname : user.getNickname())
-                .place(place != null ? place : user.getPlace().toString())
+                .place(placeList)
                 .favoriteZunsiList(favoriteZunsiList)
                 .profileImage(profileImage)
                 .build();
@@ -80,7 +84,7 @@ public class UserController {
     public ResponseEntity<SingleResult<String>> updateProfileImage(
             @RequestHeader("Authorization") String jwt,
             @RequestParam(required = false) MultipartFile profileImage
-    ) {
+    ) throws IOException {
         User user = userService.getUserByJwt(jwt);
         if (user == null) throw new IllegalArgumentException("invalid jwt token");
         if (profileImage.isEmpty()) throw new IllegalArgumentException("no image");
