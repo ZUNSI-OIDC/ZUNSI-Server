@@ -5,6 +5,7 @@ import com.oidc.zunsi.domain.response.SingleResult;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
+import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiResDto;
 import com.oidc.zunsi.service.ResponseService;
 import com.oidc.zunsi.service.UserService;
@@ -110,10 +111,10 @@ public class ZunsiController {
             @ApiParam(value = "page") @RequestParam(required = false, defaultValue = "126.976") Double longitude
     ) {
         User user = userService.getUserByJwt(jwt);
-        List<ZunsiResDto> zunsiResDtoList = zunsiService.getZunsiList(user, filter, limit, page, new Point(latitude, longitude));
+        ZunsiPageDto dto = zunsiService.getZunsiList(user, filter, limit, page, new Point(latitude, longitude));
         log.info("filter: {}\tlimit: {}\tpage: {}", filter, limit, page);
         log.info("latitude:{} \tlongitude: {}", latitude, longitude);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getPageListResult(zunsiResDtoList, false));
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getPageListResult(dto.getZunsiResDtoList(), dto.getHasNext()));
     }
 
     // 전시 리스트 가져오기 인기순

@@ -19,7 +19,7 @@ public class Hashtag extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(mappedBy = "hashtags")
+    @ManyToMany(mappedBy = "hashtags", cascade = CascadeType.ALL)
     private Set<Zunsi> zunsis = new HashSet<>();
 
     private String content;
