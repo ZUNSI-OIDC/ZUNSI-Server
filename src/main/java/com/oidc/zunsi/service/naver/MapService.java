@@ -44,8 +44,11 @@ public class MapService {
 
         JsonArray addresses = (JsonArray) jsonParser.parse(jsonObject.get("addresses").toString());
         JsonObject addressData;
+        JsonObject sidoData;
         try {
             addressData = (JsonObject) addresses.get(0);
+            JsonArray addressMetadata =(JsonArray) jsonParser.parse(addressData.get("addressElements").toString());
+            sidoData = (JsonObject) addressMetadata.get(0);
         } catch (Exception e) {
             log.info(e.getMessage());
             throw new IllegalArgumentException("주소에 해당하는 좌표를 찾지 못했습니다.");
@@ -63,6 +66,7 @@ public class MapService {
 //                .errorMessage(jsonObject.get("errorMessage").toString().replaceAll("\"", ""))
 //                .build();
         return CoordinateResDto.builder()
+                .sido(sidoData.get("shortName").toString().replaceAll("\"", ""))
                 .address(addressData.get("roadAddress").toString().replaceAll("\"", ""))
                 .point(new Point(
                         Double.parseDouble(addressData.get("x").toString().replaceAll("\"", "")),

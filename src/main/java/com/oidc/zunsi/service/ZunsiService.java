@@ -1,23 +1,33 @@
 package com.oidc.zunsi.service;
 
+import com.oidc.zunsi.domain.enums.Place;
 import com.oidc.zunsi.domain.enums.ZunsiType;
 import com.oidc.zunsi.domain.hashtag.Hashtag;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.domain.zunsi.ZunsiRepository;
+import com.oidc.zunsi.domain.zzim.Zzim;
 import com.oidc.zunsi.dto.map.CoordinateResDto;
+import com.oidc.zunsi.dto.map.RectBoxDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
+import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiResDto;
 import com.oidc.zunsi.service.naver.MapService;
 import com.oidc.zunsi.service.naver.NaverObjectStorageService;
+import com.oidc.zunsi.util.GeoUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -45,16 +55,21 @@ public class ZunsiService {
         }
 
         CoordinateResDto coordinate = mapService.getCoordinate(dto.getAddress());
+        Place place = Arrays.stream(Place.values())
+                .filter(x -> x.getKey().equals(coordinate.getSido()))
+                .findFirst()
+                .orElse(Place.etc);
 
         Zunsi zunsi = Zunsi.builder()
                 .title(dto.getTitle())
                 .user(dto.getUser())
                 .description(dto.getDescription())
                 .artist(dto.getArtist())
-                .address(dto.getAddress())
+                .place(place.getKey())
                 .placeName(dto.getPlaceName())
-                .longitude(coordinate.getX())
-                .latitude(coordinate.getY())
+                .address(coordinate.getAddress())
+                .longitude(coordinate.getPoint().getX())
+                .latitude(coordinate.getPoint().getY())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .startTime(dto.getStartTime())
@@ -76,7 +91,7 @@ public class ZunsiService {
         Set<Hashtag> hashtagSet = new HashSet<>();
         for (String ht : dto.getHashtags()) {
             Hashtag h = hashtagService.getHashtagByString(ht);
-            hashtagSet.add(h == null ? hashtagService.createHashtag(ht) :h);
+            hashtagSet.add(h == null ? hashtagService.createHashtag(ht) : h);
         }
         zunsi.setHashtags(hashtagSet);
         zunsiRepository.save(zunsi);
@@ -94,7 +109,6 @@ public class ZunsiService {
 
         List<String> hashtags = new ArrayList<>();
         Set<Hashtag> hashtagSet = zunsi.getHashtags();
-        log.info(String.valueOf(hashtagSet.size()));
         for (Hashtag h : hashtagSet) {
             hashtags.add(h.getContent());
         }
@@ -121,6 +135,53 @@ public class ZunsiService {
                 .zunsiTypes(zunsi.getZunsiTypes())
                 .hashtags(hashtags)
                 .likeNum(zzimService.getZzimCountByZunsi(zunsi))
+                .build();
+    }
+
+    public ZunsiPageDto getZunsiList(User user, String filter, Integer limit, Integer page, Point point) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        List<ZunsiResDto> res = null;
+        Page<Zunsi> pageZunsi = null;
+        switch (filter) {
+            case "zzim":
+                res = zzimService.getZzimList(user)
+                        .stream().map(Zzim::getZunsi).collect(Collectors.toList())
+                        .stream().map(this::getZunsiResDto).collect(Collectors.toList());
+                break;
+            case "recommend":
+                List<String> placeList = user.getPlace().stream().map(Place::getKey).collect(Collectors.toList());
+                List<Zunsi> zunsiList = zunsiRepository.findAllByPlaceOrderByEndDateDesc(placeList).orElse(null);
+                if (zunsiList == null) break;
+                zunsiList = zunsiList.stream()
+                        .filter(x -> {
+                            HashSet<ZunsiType> types = new HashSet<>(x.getZunsiTypes());
+                            types.retainAll(user.getFavoriteZunsiType());
+                            return types.size() > 0;
+                        }).collect(Collectors.toList());
+                int start = (int) pageRequest.getOffset();
+                int end = Math.min((start + pageRequest.getPageSize()), zunsiList.size());
+                pageZunsi = new PageImpl<>(zunsiList.subList(start, end), pageRequest, zunsiList.size());
+                break;
+            case "distance":
+                RectBoxDto box = GeoUtil.getRectBox(point);
+                pageZunsi = zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
+                        box.getUpperLeft().getX(),
+                        box.getLowerRight().getX(),
+                        box.getLowerRight().getY(),
+                        box.getUpperLeft().getY(),
+                        pageRequest
+                ).orElse(null);
+                break;
+            case "popular":
+                pageZunsi = zunsiRepository.findAllByOrderByZzimCountDescEndDateDesc(pageRequest).orElse(null);
+                break;
+        }
+        if (pageZunsi != null)
+            res = pageZunsi.getContent().stream().map(this::getZunsiResDto).collect(Collectors.toList());
+
+        return ZunsiPageDto.builder()
+                .zunsiResDtoList(res != null ? res : Collections.emptyList())
+                .hasNext(pageZunsi != null && pageZunsi.hasNext())
                 .build();
     }
 }
