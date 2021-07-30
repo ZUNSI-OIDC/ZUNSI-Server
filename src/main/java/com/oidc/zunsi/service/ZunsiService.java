@@ -8,7 +8,6 @@ import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.domain.zunsi.ZunsiRepository;
 import com.oidc.zunsi.domain.zzim.Zzim;
 import com.oidc.zunsi.dto.map.CoordinateResDto;
-import com.oidc.zunsi.dto.map.RectBoxDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiListRowDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
@@ -213,19 +212,14 @@ public class ZunsiService {
     }
 
     public List<Zunsi> getNearbyZunsi(User user, Point point) {
-        RectBoxDto box = GeoUtil.getRectBox(point);
-        Optional<List<Zunsi>> zunsi = zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
-                box.getUpperLeft().getX(),
-                box.getLowerRight().getX(),
-                box.getLowerRight().getY(),
-                box.getUpperLeft().getY()
-        );
+        int distance = 3;
+        List<Zunsi> zunsi = zunsiRepository.findAll().stream()
+                .filter(x -> GeoUtil.getDistance(point, new Point(x.getLatitude(), x.getLongitude())) < distance)
+                .collect(Collectors.toList());
 
-        if(zunsi.isEmpty()) return Collections.emptyList();
-
-        return zunsi.get().stream().filter(x -> {
+        return zunsi.stream().filter(x -> {
             Zzim zzim = zzimService.getZzim(user, x);
-            if(zzim == null) return false;
+            if (zzim == null) return false;
             else return !zzim.getIsVisited();
         }).collect(Collectors.toList());
     }
