@@ -56,10 +56,7 @@ public class VisitService {
 
     public Map<String, Double> getVisitDataByUser(User user) {
         Optional<List<Visit>> visitList = visitRepository.findAllByUser(user);
-        boolean isListExist = true;
-        if (visitList.isEmpty() || visitList.get().size() == 0) {
-            isListExist = false;
-        }
+        boolean isListExist = visitList.isPresent() && visitList.get().size() != 0;
 
         ZunsiType[] zunsiTypes = ZunsiType.values();
         Map<String, Double> favoriteData = new HashMap<>();

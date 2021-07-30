@@ -16,20 +16,19 @@ import java.util.Optional;
 @Service
 public class ZzimService {
     private final ZzimRepository zzimRepository;
-    private final VisitService visitService;
 
     @Transactional
-    public Zzim createZzim(User user, Zunsi zunsi) {
-        if(isZzimed(user, zunsi) && visitService.isExist(user, zunsi))
+    public void createZzim(User user, Zunsi zunsi) {
+        Zzim zzim = getZzim(user, zunsi);
+        if(zzim != null && zzim.getIsVisited())
             throw new IllegalArgumentException("user already visit zunsi (id: " + zunsi.getId() + ")");
 
-        Zzim zzim = Zzim.builder()
+        zzim = Zzim.builder()
                 .user(user)
                 .zunsi(zunsi)
                 .isVisited(false)
                 .build();
         zzimRepository.save(zzim);
-        return zzim;
     }
 
     public Boolean isZzimed(User user, Zunsi zunsi) {
