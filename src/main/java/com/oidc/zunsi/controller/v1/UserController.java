@@ -130,4 +130,21 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(resDto));
     }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "GPS 허용 설정")
+    @PostMapping("/me/gps/set")
+    public ResponseEntity<SingleResult<NotificationResDto>> changeGPSSetting(
+            @RequestHeader("Authorization") String jwt,
+            @RequestBody NotificationReqDto dto
+    ) {
+        User user = userService.getUserByJwt(jwt);
+        userService.changeGPSOption(user, dto.getIsEnabled());
+        NotificationResDto resDto = NotificationResDto.builder()
+                .msg(dto.getIsEnabled() ? "gps enabled" : "gps disabled")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(resDto));
+    }
 }

@@ -134,6 +134,11 @@ public class UserService {
         return zzimResDtoList;
     }
 
+    public void changeGPSOption(User user, Boolean isEnabled) {
+        user.setGps(isEnabled);
+        userRepository.save(user);
+    }
+
     public void changeNotificationOption(User user, Boolean isEnabled) {
         user.setNotification(isEnabled);
         userRepository.save(user);

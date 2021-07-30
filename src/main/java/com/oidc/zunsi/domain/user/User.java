@@ -65,6 +65,9 @@ public class User extends BaseTime implements UserDetails {
     private Set<Place> place = new HashSet<>();
 
     @Setter
+    private Boolean gps;
+
+    @Setter
     private Boolean notification;
 
     @Setter
