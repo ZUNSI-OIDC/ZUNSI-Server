@@ -50,6 +50,10 @@ public class ZzimService {
         return (long) zzims.get().size();
     }
 
+    public Zzim getZzim(User user, Zunsi zunsi) {
+        return zzimRepository.findByUserAndZunsi(user, zunsi).orElse(null);
+    }
+
     public List<Zzim> getZzimList(User user) {
         Optional<List<Zzim>> zzims = zzimRepository.findAllByUser(user);
         if(zzims.isEmpty())

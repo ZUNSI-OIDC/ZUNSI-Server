@@ -207,13 +207,21 @@ public class ZunsiService {
                 .build();
     }
 
-    public List<Zunsi> getNearbyZunsi(Point point) {
+    public List<Zunsi> getNearbyZunsi(User user, Point point) {
         RectBoxDto box = GeoUtil.getRectBox(point);
-        return zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
+        Optional<List<Zunsi>> zunsi = zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
                 box.getUpperLeft().getX(),
                 box.getLowerRight().getX(),
                 box.getLowerRight().getY(),
                 box.getUpperLeft().getY()
-        ).orElse(Collections.emptyList());
+        );
+
+        if(zunsi.isEmpty()) return Collections.emptyList();
+
+        return zunsi.get().stream().filter(x -> {
+            Zzim zzim = zzimService.getZzim(user, x);
+            if(zzim == null) return false;
+            else return !zzim.getIsVisited();
+        }).collect(Collectors.toList());
     }
 }
