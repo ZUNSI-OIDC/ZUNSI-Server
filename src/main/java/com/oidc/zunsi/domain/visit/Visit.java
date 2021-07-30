@@ -32,7 +32,7 @@ public class Visit extends BaseTime {
     @JoinColumn(name = "zunsi_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Zunsi zunsi;
-    
+
     @Setter
     private Boolean isReviewed;
 }

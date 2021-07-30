@@ -9,7 +9,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -35,8 +34,5 @@ public class Zzim extends BaseTime {
     private Zunsi zunsi;
 
     @Setter
-    LocalDateTime visited;
-
-    @Setter
-    boolean isReviewed;
+    private Boolean isVisited;
 }

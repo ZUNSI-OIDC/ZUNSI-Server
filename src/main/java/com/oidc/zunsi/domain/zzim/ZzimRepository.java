@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ZzimRepository extends JpaRepository<Zzim, Long> {
     Optional<List<Zzim>> findAllByUser(User user);
     Optional<List<Zzim>> findAllByZunsi(Zunsi zunsi);
-    Optional<List<Zzim>> findAllByUserAndZunsi(User user, Zunsi zunsi);
+    Optional<Zzim> findByUserAndZunsi(User user, Zunsi zunsi);
 }

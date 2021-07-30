@@ -8,9 +8,7 @@ import com.oidc.zunsi.dto.zunsi.ZunsiCreateReqDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiListRowDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiPageDto;
 import com.oidc.zunsi.dto.zunsi.ZunsiResDto;
-import com.oidc.zunsi.service.ResponseService;
-import com.oidc.zunsi.service.UserService;
-import com.oidc.zunsi.service.ZunsiService;
+import com.oidc.zunsi.service.*;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +33,8 @@ public class ZunsiController {
 
     private final ZunsiService zunsiService;
     private final UserService userService;
+    private final VisitService visitService;
+    private final ZzimService zzimService;
     private final ResponseService responseService;
 
     @ApiImplicitParams({
@@ -99,7 +99,7 @@ public class ZunsiController {
     }
 
     @ApiOperation(value = "전시 리스트 조회")
-    @PostMapping(value = "/list")
+    @GetMapping(value = "/list")
     public ResponseEntity<PageResult<ZunsiListRowDto>> getZunsiList(
             @RequestHeader(name = "Authorization", required = false) String jwt,
             @ApiParam(value = "filter") @RequestParam(defaultValue = "popular") String filter,
@@ -113,5 +113,49 @@ public class ZunsiController {
         log.info("filter: {}\tlimit: {}\tpage: {}", filter, limit, page);
         log.info("latitude:{} \tlongitude: {}", latitude, longitude);
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getPageListResult(dto.getZunsiListDto(), dto.getHasNext()));
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "전시 방문 처리")
+    @PostMapping(value = "/visit")
+    public ResponseEntity<SingleResult<String>> visitZunsi(
+            @RequestHeader(name = "Authorization") String jwt,
+            @ApiParam(value = "zunsi id") @PathVariable Long zunsiId
+    ) {
+        visitService.createVisit(userService.getUserByJwt(jwt), zunsiService.getZunsiById(zunsiId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult("success"));
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "전시 찜 처리")
+    @PatchMapping(value = "/zzim")
+    public ResponseEntity<SingleResult<String>> zzimZunsi(
+            @RequestHeader(name = "Authorization") String jwt,
+            @ApiParam(value = "zunsi id") @PathVariable Long zunsiId
+    ) {
+        User user = userService.getUserByJwt(jwt);
+        Zunsi zunsi = zunsiService.getZunsiById(zunsiId);
+
+        Boolean isZzimed = zzimService.isZzimed(user, zunsi);
+        Boolean isVisited = visitService.isExist(user, zunsi);
+
+        String responseMessage = null;
+        HttpStatus status = null;
+
+        if (isZzimed && !isVisited) {
+            zzimService.deleteZzim(user, zunsi);
+            responseMessage = "zzim is removed";
+            status = HttpStatus.OK;
+        } else if (!isZzimed && !isVisited) {
+            zzimService.createZzim(user, zunsi);
+            responseMessage = "zzim is created";
+            status = HttpStatus.CREATED;
+        } else throw new IllegalArgumentException("visited zunsi cannot be unzzimed");
+
+        return ResponseEntity.status(status).body(responseService.getSingleResult(responseMessage));
     }
 }
