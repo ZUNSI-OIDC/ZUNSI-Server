@@ -9,7 +9,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -42,5 +44,5 @@ public class Review extends BaseTime {
 
     @Setter
     @ElementCollection
-    private Set<String> reviewDetailImageUrls = new HashSet<>();
+    private List<String> reviewDetailImageUrls = new ArrayList<>();
 }

@@ -6,8 +6,10 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.*;
-import com.oidc.zunsi.domain.review.Review;
+import com.amazonaws.services.s3.model.AccessControlList;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.GroupGrantee;
+import com.amazonaws.services.s3.model.Permission;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.zunsi.Zunsi;
 import com.oidc.zunsi.util.FileManager;
@@ -65,10 +67,10 @@ public class NaverObjectStorageService {
         return imageUrlList;
     }
 
-    public List<String> uploadReviewImages(Review review, MultipartFile[] imageFiles) throws IOException {
+    public List<String> uploadReviewImages(String uuid, MultipartFile[] imageFiles) throws IOException {
         List<String> imageUrlList = new ArrayList<>();
         for (int i = 0; i < imageFiles.length; i++)
-            imageUrlList.add(uploadImage(imageFiles[i], "review-image/" + review.getId(), "review" + i));
+            imageUrlList.add(uploadImage(imageFiles[i], "review-image/" + uuid, "review" + i));
         return imageUrlList;
     }
 
