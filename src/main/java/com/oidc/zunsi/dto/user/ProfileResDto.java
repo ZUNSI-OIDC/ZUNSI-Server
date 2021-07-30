@@ -1,12 +1,10 @@
 package com.oidc.zunsi.dto.user;
 
-import com.oidc.zunsi.domain.enums.Place;
-import com.oidc.zunsi.domain.enums.ZunsiType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @Getter
@@ -14,8 +12,8 @@ import java.util.Set;
 public class ProfileResDto {
     private String username;
     private String nickname;
-    private Set<Place> place;
-    private Set<ZunsiType> zunsiTypeList;
+    private List<String> place;
+    private List<String> zunsiTypeList;
     private Long reviewNum;
     private Long zzimNum;
     private String profileImgUrl;

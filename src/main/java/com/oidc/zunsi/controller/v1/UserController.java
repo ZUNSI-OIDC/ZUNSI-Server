@@ -35,9 +35,12 @@ public class UserController {
     })
     @ApiOperation(value = "내 프로필 조회")
     @GetMapping("/me")
-    public ResponseEntity<SingleResult<ProfileResDto>> getProfile(@RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<SingleResult<ProfileWithAnalyticsDto>> getProfile(@RequestHeader("Authorization") String jwt) {
         User user = userService.getUserByJwt(jwt);
-        ProfileResDto dto = userService.getProfileResDto(user);
+        ProfileWithAnalyticsDto dto = ProfileWithAnalyticsDto.builder()
+                .profile(userService.getProfileResDto(user))
+                .analytics(userService.getAnalytics(user))
+                .build();
         log.info(dto.toString());
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(dto));
     }
@@ -90,17 +93,6 @@ public class UserController {
         if (profileImage.isEmpty()) throw new IllegalArgumentException("no image");
         userService.updateProfileImage(user, profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult("success"));
-    }
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", value = "jwt 토큰", required = true, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "내가 방문한 전시 선호도 분석")
-    @GetMapping("/analytics")
-    public ResponseEntity<SingleResult<AnalyticsResDto>> getAnalytics(@RequestHeader("Authorization") String jwt) {
-        User user = userService.getUserByJwt(jwt);
-        AnalyticsResDto dto = userService.getAnalytics(user);
-        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(dto));
     }
 
     @ApiImplicitParams({

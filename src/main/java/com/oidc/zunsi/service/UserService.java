@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -73,8 +74,8 @@ public class UserService {
         return ProfileResDto.builder()
                 .username(user.getUsername())
                 .nickname(user.getNickname())
-                .place(user.getPlace())
-                .zunsiTypeList(user.getFavoriteZunsiType())
+                .place(user.getPlace().stream().map(Place::getKo).collect(Collectors.toList()))
+                .zunsiTypeList(user.getFavoriteZunsiType().stream().map(ZunsiType::getKo).collect(Collectors.toList()))
                 .reviewNum(reviewService.getReviewCountByUser(user))
                 .zzimNum(zzimService.getZzimCountByUser(user))
                 .profileImgUrl(user.getProfileImageUrl())
