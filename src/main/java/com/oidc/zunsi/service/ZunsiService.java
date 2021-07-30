@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,8 +112,8 @@ public class ZunsiService {
                 .thumbnailUrl(zunsi.getPosterImageUrl())
                 .title(zunsi.getTitle())
                 .placeName(zunsi.getPlaceName())
-                .startDate(zunsi.getStartDate())
-                .endDate(zunsi.getEndDate())
+                .startDate(Timestamp.valueOf(zunsi.getStartDate().atStartOfDay()).getTime())
+                .endDate(Timestamp.valueOf(zunsi.getEndDate().atStartOfDay()).getTime())
                 .isZzimed(user != null ? zzimService.isZzimed(user, zunsi) : false)
                 .build();
     }
@@ -139,8 +140,8 @@ public class ZunsiService {
                 .artist(zunsi.getArtist())
                 .posterImageUrl(zunsi.getPosterImageUrl())
                 .detailImageUrls(zunsi.getDetailImageUrls())
-                .startDate(zunsi.getStartDate())
-                .endDate(zunsi.getEndDate())
+                .startDate(Timestamp.valueOf(zunsi.getStartDate().atStartOfDay()).getTime())
+                .endDate(Timestamp.valueOf(zunsi.getEndDate().atStartOfDay()).getTime())
                 .startTime(zunsi.getStartTime())
                 .endTime(zunsi.getEndTime())
                 .address(zunsi.getAddress())

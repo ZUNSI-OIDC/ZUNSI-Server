@@ -14,7 +14,7 @@ import java.util.Set;
 public class ProfileResDto {
     private String username;
     private String nickname;
-    private Place place;
+    private Set<Place> place;
     private Set<ZunsiType> zunsiTypeList;
     private Long reviewNum;
     private Long zzimNum;

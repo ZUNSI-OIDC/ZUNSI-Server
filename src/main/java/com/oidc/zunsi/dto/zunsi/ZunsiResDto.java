@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
@@ -23,8 +22,8 @@ public class ZunsiResDto {
     private String artist;
     private String posterImageUrl;
     private List<String> detailImageUrls;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Long startDate;
+    private Long endDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private String address;

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -77,7 +78,7 @@ public class ReviewService {
                 .username(review.getUser().getUsername())
                 .content(review.getContent())
                 .detailImageUrls(review.getReviewDetailImageUrls())
-                .createdAt(review.getCreatedAt().toLocalDate())
+                .createdAt(Timestamp.valueOf(review.getCreatedAt()).getTime())
                 .build();
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class ProfileReqDto {
     private String username;
     private String nickname;
-    private String place;
+    private List<String> place;
     private List<String> favoriteZunsiList;
     private MultipartFile profileImage;
 }
