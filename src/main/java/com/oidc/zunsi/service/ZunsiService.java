@@ -206,4 +206,14 @@ public class ZunsiService {
                 .hasNext(pageZunsi != null && pageZunsi.hasNext())
                 .build();
     }
+
+    public List<Zunsi> getNearbyZunsi(Point point) {
+        RectBoxDto box = GeoUtil.getRectBox(point);
+        return zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
+                box.getUpperLeft().getX(),
+                box.getLowerRight().getX(),
+                box.getLowerRight().getY(),
+                box.getUpperLeft().getY()
+        ).orElse(Collections.emptyList());
+    }
 }
