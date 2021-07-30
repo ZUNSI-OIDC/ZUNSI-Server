@@ -164,6 +164,8 @@ public class ZunsiService {
     public ZunsiPageDto getZunsiList(User user, String filter, Integer limit, Integer page, Point point) {
         PageRequest pageRequest = PageRequest.of(page, limit);
         List<ZunsiListRowDto> res = null;
+        int start, end;
+        List<Zunsi> zunsiList = null;
         Page<Zunsi> pageZunsi = null;
         switch (filter) {
             case "zzim":
@@ -173,7 +175,7 @@ public class ZunsiService {
                 break;
             case "recommend":
                 String[] placeList = user.getPlace().stream().map(Place::getKey).collect(Collectors.toList()).toArray(String[]::new);
-                List<Zunsi> zunsiList = zunsiRepository.findAllByPlaceOrderByEndDateDesc(placeList).orElse(null);
+                zunsiList = zunsiRepository.findAllByPlaceOrderByEndDateDesc(placeList).orElse(null);
                 if (zunsiList == null) break;
                 zunsiList = zunsiList.stream()
                         .filter(x -> {
@@ -181,19 +183,21 @@ public class ZunsiService {
                             types.retainAll(user.getFavoriteZunsiType());
                             return types.size() > 0;
                         }).collect(Collectors.toList());
-                int start = (int) pageRequest.getOffset();
-                int end = Math.min((start + pageRequest.getPageSize()), zunsiList.size());
+                start = (int) pageRequest.getOffset();
+                end = Math.min((start + pageRequest.getPageSize()), zunsiList.size());
                 pageZunsi = new PageImpl<>(zunsiList.subList(start, end), pageRequest, zunsiList.size());
                 break;
             case "distance":
-                RectBoxDto box = GeoUtil.getRectBox(point);
-                pageZunsi = zunsiRepository.findAllByLatitudeBetweenAndLongitudeBetweenOrderByEndDate(
-                        box.getUpperLeft().getX(),
-                        box.getLowerRight().getX(),
-                        box.getLowerRight().getY(),
-                        box.getUpperLeft().getY(),
-                        pageRequest
-                ).orElse(null);
+                // TODO: 최적화 매우 필요
+                zunsiList = zunsiRepository.findAll().stream()
+                        .sorted((a, b) -> {
+                            Point p1 = new Point(a.getLatitude(), a.getLongitude());
+                            Point p2 = new Point(b.getLatitude(), b.getLongitude());
+                            return Integer.compare(GeoUtil.getDistance(point, p1), GeoUtil.getDistance(point, p2));
+                        }).collect(Collectors.toList());
+                start = (int) pageRequest.getOffset();
+                end = Math.min((start + pageRequest.getPageSize()), zunsiList.size());
+                pageZunsi = new PageImpl<>(zunsiList.subList(start, end), pageRequest, zunsiList.size());
                 break;
             case "popular":
                 pageZunsi = zunsiRepository.findAllByOrderByZzimCountDescEndDateDesc(pageRequest).orElse(null);
