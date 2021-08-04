@@ -3,6 +3,7 @@ package com.oidc.zunsi.service.social;
 import com.google.gson.Gson;
 import com.oidc.zunsi.domain.enums.SnsType;
 import com.oidc.zunsi.domain.social.naver.NaverProfile;
+import com.oidc.zunsi.dto.auth.SnsInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,12 @@ import java.util.Map;
 public class NaverService implements SocialService {
 
     @Override
-    public String getSnsId(String token) {
+    public SnsInfoDto getSnsInfo(String token) {
         NaverProfile naverProfile = getProfile(token);
-        return naverProfile.getId();
+        return SnsInfoDto.builder()
+                .id(naverProfile.getId())
+                .name(naverProfile.getName())
+                .build();
     }
 
     @Override

@@ -1,10 +1,13 @@
 package com.oidc.zunsi.service;
 
+import com.oidc.zunsi.config.security.JwtTokenProvider;
 import com.oidc.zunsi.domain.enums.Place;
 import com.oidc.zunsi.domain.enums.SnsType;
 import com.oidc.zunsi.domain.enums.ZunsiType;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.dto.auth.SignupReqDto;
+import com.oidc.zunsi.dto.auth.SnsInfoDto;
+import com.oidc.zunsi.dto.auth.TokenDto;
 import com.oidc.zunsi.service.social.SocialServiceFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import java.util.Set;
 public class SignService {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final SocialServiceFactory socialServiceFactory;
 
     public User getUserFromDto(SignupReqDto dto) {
@@ -50,15 +54,24 @@ public class SignService {
             }
         }
 
+        SnsInfoDto info = socialServiceFactory.getService(provider).getSnsInfo(accessToken);
+
         return User.builder()
-                .username(name)
+                .username(info.getName())
                 .nickname(name)
-                .snsId(socialServiceFactory.getService(provider).getSnsId(accessToken))
+                .snsId(info.getId())
                 .place(placeTypeList)
                 .favoriteZunsiType(zunsiTypeList)
                 .provider(provider)
                 .profileImageUrl(null)
                 .role(User.Role.USER)
+                .build();
+    }
+
+    public TokenDto createToken(User user) {
+        return TokenDto.builder()
+                .accessToken(jwtTokenProvider.createToken(user))
+                .refreshToken(jwtTokenProvider.createToken(null))
                 .build();
     }
 }

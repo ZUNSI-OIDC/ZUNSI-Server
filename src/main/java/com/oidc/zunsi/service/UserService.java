@@ -7,6 +7,7 @@ import com.oidc.zunsi.domain.enums.ZunsiType;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.domain.user.UserRepository;
 import com.oidc.zunsi.domain.zzim.Zzim;
+import com.oidc.zunsi.dto.auth.SnsInfoDto;
 import com.oidc.zunsi.dto.user.*;
 import com.oidc.zunsi.service.naver.NaverObjectStorageService;
 import com.oidc.zunsi.service.social.SocialServiceFactory;
@@ -33,7 +34,7 @@ public class UserService {
     private final NaverObjectStorageService naverObjectStorageService;
 
     public boolean isUserExist(SnsType provider, String accessToken) {
-        String snsId = getSnsId(provider, accessToken);
+        String snsId = getSnsInfo(provider, accessToken).getId();
         Optional<User> user = userRepository.findBySnsIdAndProvider(snsId, provider);
         return user.isPresent();
     }
@@ -45,7 +46,7 @@ public class UserService {
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid provider");
         }
-        String snsId = getSnsId(snsType, accessToken);
+        String snsId = getSnsInfo(snsType, accessToken).getId();
         return userRepository.findBySnsIdAndProvider(snsId, snsType).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
@@ -54,8 +55,8 @@ public class UserService {
         return 0 < username.length() && username.length() < 11 && isValidCharacter;
     }
 
-    public String getSnsId(SnsType provider, String accessToken) {
-        return socialServiceFactory.getService(provider).getSnsId(accessToken);
+    public SnsInfoDto getSnsInfo(SnsType provider, String accessToken) {
+        return socialServiceFactory.getService(provider).getSnsInfo(accessToken);
     }
 
     @Transactional

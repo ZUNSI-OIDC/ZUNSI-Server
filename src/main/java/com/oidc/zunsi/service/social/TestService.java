@@ -1,13 +1,17 @@
 package com.oidc.zunsi.service.social;
 
 import com.oidc.zunsi.domain.enums.SnsType;
+import com.oidc.zunsi.dto.auth.SnsInfoDto;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TestService implements SocialService {
     @Override
-    public String getSnsId(String token) {
-        return token;
+    public SnsInfoDto getSnsInfo(String token) {
+        return SnsInfoDto.builder()
+                .id(token)
+                .name("익명의 유저")
+                .build();
     }
 
     @Override
