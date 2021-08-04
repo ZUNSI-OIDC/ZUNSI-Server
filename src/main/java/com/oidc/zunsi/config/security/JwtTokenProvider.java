@@ -35,9 +35,15 @@ public class JwtTokenProvider {
     }
 
     // Jwt 토큰 생성
-    public String createToken(String userPk, User.Role role) {
-        Claims claims = Jwts.claims().setSubject(userPk);
-        claims.put("role", role);
+    public String createToken(User user) {
+        Claims claims;
+        if(user == null) {
+            claims = Jwts.claims();
+        } else {
+            claims = Jwts.claims().setSubject(user.getId().toString());
+            claims.put("role", user.getRole());
+        }
+
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -73,7 +79,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("invalid token");
             return false;
         }
     }

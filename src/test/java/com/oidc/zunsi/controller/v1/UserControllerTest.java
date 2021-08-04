@@ -20,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -62,12 +63,12 @@ public class UserControllerTest {
                 .provider(testUserSnsType)
                 .username("ZUNSI_테스터")
                 .role(User.Role.USER)
-                .place(Place.Daejeon)
+                .place(new HashSet<>(Collections.singletonList(Place.Daejeon)))
                 .favoriteZunsiType(new HashSet<>(Arrays.asList(ZunsiType.installation, ZunsiType.design)))
                 .profileImageUrl(null)
                 .role(User.Role.USER)
                 .build());
-        jwt = jwtTokenProvider.createToken(String.valueOf(user.getId()), user.getRole());
+        jwt = jwtTokenProvider.createToken(user);
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.oidc.zunsi.domain.social.naver.NaverProfile;
 import com.oidc.zunsi.domain.user.User;
 import com.oidc.zunsi.dto.auth.SigninReqDto;
 import com.oidc.zunsi.dto.auth.SignupReqDto;
+import com.oidc.zunsi.dto.auth.TokenDto;
 import com.oidc.zunsi.service.ResponseService;
 import com.oidc.zunsi.service.SignService;
 import com.oidc.zunsi.service.UserService;
@@ -64,23 +65,24 @@ public class SignController {
 
     @ApiOperation(value = "소셜 로그인")
     @PostMapping(value = "/signin")
-    public ResponseEntity<SingleResult<String>> signinByProvider(
+    public ResponseEntity<SingleResult<TokenDto>> signinByProvider(
             @ApiParam(value = "json") @RequestBody SigninReqDto signinReqDto
     ) {
+        log.info("signin  with " + signinReqDto.getProvider());
         User user = userService.getUserByProviderAndToken(signinReqDto.getProvider(), signinReqDto.getAccessToken());
-        String jwt = jwtTokenProvider.createToken(String.valueOf(user.getId()), user.getRole());
-        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(jwt));
+        TokenDto tokens = signService.createToken(user);
+        return ResponseEntity.status(HttpStatus.OK).body(responseService.getSingleResult(tokens));
     }
 
     @ApiOperation(value = "소셜 계정 가입", notes = "성공시 jwt 토큰을 반환합니다")
     @PostMapping(value = "/signup")
-    public ResponseEntity<SingleResult<String>> signupProvider(
+    public ResponseEntity<SingleResult<TokenDto>> signupProvider(
             @RequestBody SignupReqDto dto
     ) throws IOException {
         log.info(dto.toString());
         User newUser = signService.getUserFromDto(dto);
         userService.save(newUser, null);
-        String jwt = jwtTokenProvider.createToken(String.valueOf(newUser.getId()), newUser.getRole());
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(jwt));
+        TokenDto tokens = signService.createToken(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseService.getSingleResult(tokens));
     }
 }

@@ -69,7 +69,7 @@ public class SignControllerTest {
                 "    \"provider\": \"test\",\n" +
                 "    \"accessToken\": \"1111\",\n" +
                 "    \"name\": \"카카로트\",\n" +
-                "    \"place\": \"Seoul\",\n" +
+                "    \"place\": [\"Seoul\"],\n" +
                 "    \"favoriteZunsiList\": [\n" +
                 "        \"installation\",\n" +
                 "        \"design\"\n" +
